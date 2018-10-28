@@ -1,6 +1,5 @@
 import React from "react";
 
-export const Error = () => <h1>Error</h1>;
+export const Error = () => <li>Fail! </li>;
 
-
-export const Loading = () => <h1> Loading!!!</h1>;
+export const Loading = () => <li>Loading.... </li>;

@@ -1,11 +1,13 @@
 import React, { Component } from "react";
 import { fetchStates } from "../consts/fetch";
 import { Error, Loading } from "./FetchStates";
+import WithRepos from "./WithRepos";
 import { getRepos } from "../helpers/repos";
 
 class App extends Component {
   state = {
-    fetchStatus: fetchStates.idle
+    fetchStatus: fetchStates.idle,
+    org: "nodejs"
   };
 
   async getRepos() {
@@ -13,17 +15,23 @@ class App extends Component {
       fetchStatus: fetchStates.loading
     });
 
-    const response = await getRepos();
-
-    if (response.length > 0) {
-      this.setState({
-        repos: response,
-        fetchStatus: fetchStates.completeWithData
-      });
-    } else {
+    try {
+      const response = await getRepos(this.state.org);
+      if (response && response.length > 0) {
+        this.setState({
+          repos: response,
+          fetchStatus: fetchStates.completeWithData
+        });
+      } else {
+        this.setState({
+          repos: null,
+          fetchStatus: fetchStates.completeWithoutData
+        });
+      }
+    } catch (e) {
       this.setState({
         repos: null,
-        fetchStatus: fetchStates.completeWithoutData
+        fetchStatus: fetchStates.error
       });
     }
   }
@@ -33,24 +41,19 @@ class App extends Component {
   }
 
   render() {
-    const { fetchStatus } = this.state;
-
-    //TODO - extract to reusable components & don't define in render
-    const HasRepos = () => <div />;
-    const HasNoRepos = () => <h1>Got No Repos!</h1>;
+    const { fetchStatus, org, repos } = this.state;
+    const WithNoRepos = () => <h1>Got No Repos!</h1>;
 
     //TODO - extract to <WithData/> component in future
     const HandleFetchStatus = {
-      [fetchStates.completeWithoutData]: <HasNoRepos />,
-      [fetchStates.completeWithData]: <HasRepos />,
+      [fetchStates.completeWithoutData]: <WithNoRepos />,
+      [fetchStates.completeWithData]: <WithRepos org={org} repos={repos} />,
       [fetchStates.error]: <Error />,
       [fetchStates.loading]: <Loading />,
       [fetchStates.idle]: null
     };
 
-    return (
-      <section className="repos">{HandleFetchStatus[fetchStatus]}</section>
-    );
+    return <ul>{HandleFetchStatus[fetchStatus]}</ul>;
   }
 }
 

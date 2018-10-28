@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Error/> renders as expected 1`] = `
+<li>
+  Fail! 
+</li>
+`;
+
+exports[`<Loading/> renders as expected 1`] = `
+<li>
+  Loading.... 
+</li>
+`;
